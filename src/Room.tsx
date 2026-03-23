@@ -152,8 +152,18 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
   }
 
   const roomId = room.name || 'unknown';
-  const dateText = now.toLocaleDateString('en-GB');
-  const timeText = now.toLocaleTimeString('en-GB', { hour12: false });
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  const weekDay = now.toLocaleDateString('en-GB', { weekday: 'short' });
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const timeZoneName = Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
+    .formatToParts(now)
+    .find((part) => part.type === 'timeZoneName')?.value;
+  const timeZone = timeZoneName || 'LOCAL';
+  const cctvStamp = `${day}-${month}-${year} ${weekDay} ${hours}:${minutes}:${seconds} ${timeZone}`;
 
   // determine layout to use
   let main: ReactElement = <></>;
@@ -178,19 +188,8 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
   return (
     <div className={containerClass}>
       <div className="cctvOverlay" aria-label="camera overlay">
-        <div className="cctvOverlay__badge">LIVE</div>
-        <div className="cctvOverlay__row">
-          <span className="cctvOverlay__label">CAM ID</span>
-          <span className="cctvOverlay__value">{roomId}</span>
-        </div>
-        <div className="cctvOverlay__row">
-          <span className="cctvOverlay__label">DATE</span>
-          <span className="cctvOverlay__value">{dateText}</span>
-        </div>
-        <div className="cctvOverlay__row">
-          <span className="cctvOverlay__label">TIME</span>
-          <span className="cctvOverlay__value">{timeText}</span>
-        </div>
+        <div className="cctvOverlay__stamp">{cctvStamp}</div>
+        <div className="cctvOverlay__cameraId">CAM {roomId}</div>
       </div>
       {main}
       <RoomAudioRenderer />
