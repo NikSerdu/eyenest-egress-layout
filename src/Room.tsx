@@ -57,6 +57,7 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
   const room = useRoomContext();
   const [layout] = useState(initialLayout);
   const [hasScreenShare, setHasScreenShare] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const screenshareTracks = useTracks([Track.Source.ScreenShare], {
     onlySubscribed: true,
   });
@@ -120,6 +121,14 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
     }
   }, [screenshareTracks]);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   const allTracks = useTracks(
     [Track.Source.Camera, Track.Source.ScreenShare, Track.Source.Unknown],
     {
@@ -141,6 +150,10 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
   if (interfaceStyle) {
     containerClass += ` ${interfaceStyle}`;
   }
+
+  const roomId = room.name || 'unknown';
+  const dateText = now.toLocaleDateString('en-GB');
+  const timeText = now.toLocaleTimeString('en-GB', { hour12: false });
 
   // determine layout to use
   let main: ReactElement = <></>;
@@ -164,12 +177,19 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
 
   return (
     <div className={containerClass}>
-      <div className="">
-        <div className="">
-          <h1>Room</h1>
+      <div className="cctvOverlay" aria-label="camera overlay">
+        <div className="cctvOverlay__badge">LIVE</div>
+        <div className="cctvOverlay__row">
+          <span className="cctvOverlay__label">CAM ID</span>
+          <span className="cctvOverlay__value">{roomId}</span>
         </div>
-        <div className="">
-          <p>Room subtitle</p>
+        <div className="cctvOverlay__row">
+          <span className="cctvOverlay__label">DATE</span>
+          <span className="cctvOverlay__value">{dateText}</span>
+        </div>
+        <div className="cctvOverlay__row">
+          <span className="cctvOverlay__label">TIME</span>
+          <span className="cctvOverlay__value">{timeText}</span>
         </div>
       </div>
       {main}
