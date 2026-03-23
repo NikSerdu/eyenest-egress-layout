@@ -164,6 +164,14 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
 
   return (
     <div className={containerClass}>
+      <div className="">
+        <div className="">
+          <h1>Room</h1>
+        </div>
+        <div className="">
+          <p>Room subtitle</p>
+        </div>
+      </div>
       {main}
       <RoomAudioRenderer />
     </div>
