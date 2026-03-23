@@ -152,18 +152,18 @@ function CompositeTemplate({ layout: initialLayout }: CompositeTemplateProps) {
   }
 
   const roomId = room.name || 'unknown';
-  const day = String(now.getDate()).padStart(2, '0');
   const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
   const year = now.getFullYear();
-  const weekDay = now.toLocaleDateString('en-GB', { weekday: 'short' });
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  const timeZoneName = Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
-    .formatToParts(now)
-    .find((part) => part.type === 'timeZoneName')?.value;
-  const timeZone = timeZoneName || 'LOCAL';
-  const cctvStamp = `${day}-${month}-${year} ${weekDay} ${hours}:${minutes}:${seconds} ${timeZone}`;
+  const offsetMinutes = -now.getTimezoneOffset();
+  const offsetSign = offsetMinutes >= 0 ? '+' : '-';
+  const offsetHours = String(Math.floor(Math.abs(offsetMinutes) / 60)).padStart(2, '0');
+  const offsetMins = String(Math.abs(offsetMinutes) % 60).padStart(2, '0');
+  const timeZone = `UTC${offsetSign}${offsetHours}:${offsetMins}`;
+  const cctvStamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${timeZone}`;
 
   // determine layout to use
   let main: ReactElement = <></>;
